@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kubeinsights-storage
+  namespace: kubeinsights
+spec:
+  serviceName: kubeinsights-storage
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kubeinsights-storage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kubeinsights-storage
+    spec:
+      containers:
+        - name: clickhouse
+          image: clickhouse/clickhouse-server:24.8
+          ports:
+            - containerPort: 8123
+              name: http
+            - containerPort: 9000
+              name: native
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/clickhouse
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 20Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeinsights-storage
+  namespace: kubeinsights
+spec:
+  selector:
+    app.kubernetes.io/name: kubeinsights-storage
+  ports:
+    - name: http
+      port: 8123
+      targetPort: http
+    - name: native
+      port: 9000
+      targetPort: native
+

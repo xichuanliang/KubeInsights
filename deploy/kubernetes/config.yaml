@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubeinsights-config
+  namespace: kubeinsights
+data:
+  config.yaml: |
+    http:
+      enabled: true
+    tcp:
+      rtt: true
+      retransmission: true
+    tls:
+      enabled: true
+    network:
+      topology: true
+      path: true
+    analyzer:
+      slowDependencyMs: 100
+      slowNetworkMs: 50
+      slowTLSMs: 100
+      slowAppMs: 100
+

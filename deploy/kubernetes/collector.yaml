@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeinsights-collector
+  namespace: kubeinsights
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kubeinsights-collector
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kubeinsights-collector
+    spec:
+      containers:
+        - name: collector
+          image: kubeinsights-agent:v1
+          imagePullPolicy: IfNotPresent
+          args:
+            - "--mode=mock"
+            - "--listen=:8080"
+          ports:
+            - containerPort: 8080
+              name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubeinsights-collector
+  namespace: kubeinsights
+spec:
+  selector:
+    app.kubernetes.io/name: kubeinsights-collector
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+
